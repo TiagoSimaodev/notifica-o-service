@@ -1,5 +1,8 @@
 package br.com.pedidos.notificacao.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.FanoutExchange;
@@ -24,20 +27,49 @@ public class RabbitmqConfig {
 	@Value("${rabbitmq.queue.name}")
 	private String queueName;
 	
+	
+	@Value("${rabbitmq.exchange.dlx.name}")
+	private String exchangeDlxName;
+	
+	@Value("${rabbitmq.queue.dlq.name}")
+	private String queueDlqName;
+	
+	
+	
 	@Bean
 	public FanoutExchange pedidosExchange() {
 		return new FanoutExchange(exchangeName);
 	}
 	
+	
+	@Bean
+	public FanoutExchange pedidosDlxExchange() {
+		return new FanoutExchange(exchangeDlxName);
+	}
+	
+	
 	@Bean
 	public Queue notificacaoQueue() {
-		return new Queue(queueName);
+		
+		Map<String, Object> argumentos = new HashMap<>();
+		argumentos.put("x-dead-letter-exchange", exchangeDlxName);
+		return new Queue(queueName, true, false, false, argumentos);
+	}
+	
+	@Bean
+	public Queue notificacaoDlqQueue() {
+		return new Queue(queueDlqName);
 	}
 	
 	
 	@Bean
 	public Binding binding() {
 		return BindingBuilder.bind(notificacaoQueue()).to(pedidosExchange());
+	}
+	
+	@Bean
+	public Binding bindingDlq() {
+		return BindingBuilder.bind(notificacaoDlqQueue()).to(pedidosDlxExchange());
 	}
 	
 	@Bean
