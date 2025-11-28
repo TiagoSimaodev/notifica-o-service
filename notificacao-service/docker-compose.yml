@@ -1,19 +1,13 @@
 version: '3.8'
 
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbitmq
-      RABBITMQ_DEFAULT_PASS: rabbitmq
+  notificacao-service:
+    build: .
+    container_name: notificacao-service
     ports:
-      - "15672:15672"
-      - "5672:5672"
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-      - rabbitmq_log:/var/log/rabbitmq
-
-volumes:
-  rabbitmq_data:
-  rabbitmq_log:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    depends_on: []
