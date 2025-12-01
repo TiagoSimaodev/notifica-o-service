@@ -8,6 +8,7 @@ services:
       - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_HOST: 172.31.39.41
       RABBITMQ_PORT: 5672
     depends_on: []
+
